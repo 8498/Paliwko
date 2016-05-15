@@ -22,6 +22,10 @@ Route::get('/map', function() {
 
 Route::auth();
 
+Route::group(['middleware' => ['role:Administrator']], function() {
+	Route::resource('users', 'UsersController');
+});
+
 Route::get('/home', 'HomeController@index');
 
 });

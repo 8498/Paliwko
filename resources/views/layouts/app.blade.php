@@ -50,6 +50,11 @@
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url('/home') }}">Home</a></li>
                     <li><a href="{{ url('/map') }}">Map</a>
+                    @if (Auth::check())
+                    	@role('Administrator')
+    						<li><a href="{{ url('/users') }}">Uzytkownicy</a>
+						@endrole
+                    @endif
                 </ul>
 
                 <!-- Right Side Of Navbar -->

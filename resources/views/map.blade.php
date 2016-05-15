@@ -43,7 +43,6 @@ var map = L.map('map')
 	
 	function onLocationError(e) {
     alert(e.message);
-    location.reload();
 	}
 
 	map.on('locationerror', onLocationError);
