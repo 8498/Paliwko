@@ -42,26 +42,5 @@ class RolesTableSeeder extends Seeder
         $subscriber = Role::where('name','=','Subscriber')->first();
         $subscriberUser->attachRole($subscriber);
         
-        
-        /*$admin = new Role();
-        $admin->name         = 'Administrator';
-        $admin->display_name = 'Admin'; // optional
-        $admin->description  = 'Administrator'; // optional
-        $admin->save();
-        
-        $moderator = new Role();
-        $moderator->name         = 'Moderator';
-        $moderator->display_name = 'Mod'; // optional
-        $moderator->description  = 'Moderator'; // optional
-        $moderator->save();
-        
-        $subscriber = new Role();
-        $subscriber->name         = 'Subscriber';
-        $subscriber->display_name = 'Sub'; // optional
-        $subscriber->description  = 'Registered User'; // optional
-        $subscriber->save();
-        
-         $adminUser = User::where('name','Administrator')->first();
-         $adminUser->attachRole($admin); */
     }
 }
