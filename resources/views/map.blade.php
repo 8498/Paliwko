@@ -28,18 +28,24 @@ var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/
 var map = L.map('map')
     .addLayer(mapboxTiles)
 	
-	map.locate({setView: true, maxZoom: 16});
+	map.locate({setView: true,watch:true,maxZoom: 16});
 	
-	function onLocationFound(e) {
-    var radius = e.accuracy / 3;
+	var marker = null;
 
-    L.marker(e.latlng).addTo(map)
-        .bindPopup("You are within " + radius + " meters from this point").openPopup();
+	var circle = null;
 
-    L.circle(e.latlng, radius).addTo(map);
-	}
-	
-	map.on('locationfound', onLocationFound);
+	map.on('locationfound', function (e) {
+
+		var radius = e.accuracy / 3;
+		
+		if(marker !== null && circle !== null) {
+			map.removeLayer(marker);
+			map.removeLayer(circle);
+			}
+			marker = L.marker(e.latlng).addTo(map);
+			
+			circle = L.circle(e.latlng, radius).addTo(map);
+		});
 	
 	function onLocationError(e) {
     alert(e.message);
