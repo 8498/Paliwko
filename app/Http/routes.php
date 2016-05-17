@@ -1,5 +1,7 @@
 <?php
 
+use App\Position;
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -20,11 +22,33 @@ Route::get('/map', function() {
 	return view('map');
 });
 
+Route::get('/getRequest', function(){
+	if(Request::ajax())
+	{
+		return 'getRequest has loaded completely.';
+	}
+});
+/*Route::post('/getCords', function() {
+	$data = Input::all();
+	if(Request::ajax())
+	{
+		$position = new Position();
+		$position->latitude = $data['lat'];
+		$position->longtitude = $data['lng'];
+		$position->save();
+		return Response::json(Request::all());
+    	//return var_dump(Response::json());
+	}
+});*/
+
 Route::auth();
 
-Route::group(['middleware' => ['role:Administrator']], function() {
+Route::group(['middleware' => ['role:admin|mod']], function() {
 	Route::resource('users', 'UsersController');
 });
+/*Route::group(['middleware' => ['role:mod']], function() {
+	Route::resource('users', 'UsersController');
+});*/
 
 Route::get('/home', 'HomeController@index');
 

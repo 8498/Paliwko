@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use Illuminate\Http\Request;
+use App\Position;
+use App\User;
+use App\Role;
 
 class HomeController extends Controller
 {
@@ -26,4 +29,11 @@ class HomeController extends Controller
     {
         return view('home');
     }
+    /*public function addCords()
+    {
+    	$position = new Position();
+    	$position->
+    	$msg = "This is a simple message.";
+    	return response()->json(array('msg'=> $msg), 200);
+    }*/
 }

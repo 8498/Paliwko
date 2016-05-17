@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Http\Requests;
 use Illuminate\Support\Facades\DB;
+use App\User;
+use App\Role;
 
 class UsersController extends Controller
 {
@@ -16,11 +17,18 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = DB::table('users')->groupBy('name')->get();
-
+    	if(\Entrust::hasRole('admin'))
+    	{
+        	$users = DB::table('users')->groupBy('name')->get();
+    	}
+    	else
+    	{
+    	$users = Role::where('name', 'sub')->first()->users()->get();
+    	}
+    	
         return view('users.index', ['users' => $users]);
     }
-
+	
     /**
      * Show the form for creating a new resource.
      *
@@ -61,7 +69,13 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        //
+    	$user = User::find($id);
+    	$role = Role::where('name', '=', 'mod')->firstOrFail();
+        
+    	$user->detachRoles($user->roles);
+    	$user->roles()->attach($role->id);
+    	
+    	return view('home');
     }
 
     /**

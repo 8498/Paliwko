@@ -10,7 +10,6 @@
         		<thead>
                 	<th>Name</th>
                 	<th>Email</th>
-                	<th>Password</th>
             	</thead>
             	<tbody>
                 	@foreach ($users as $user)
@@ -23,21 +22,11 @@
                             <td class="table-text">
                             	<div>{{ $user->email }}</div>
                             </td>
-                            
-                            <td class="table-text">
-                            	<div>{{ $user->password }}</div>
-                            </td>
-
+							@role('admin')
                             <td>
-                            	<form action="{{ url('user/'.$user->id) }}" method="POST">
-            						{{ csrf_field() }}
-            						{{ method_field('Edit') }}
-
-            						<button type="submit" id="edit-user-{{ $user->id }}" class="btn btn-danger">
-                					<i class="fa fa-btn fa-trash"></i>Edit
-            						</button>
-        						</form>
+                            	<a class="btn btn-small btn-info" href="{{ URL::to('users/' . $user->id . '/edit') }}">Moderator</a>
                             </td>
+                            @endrole
                         </tr>
                         @endforeach
                 </tbody>

@@ -7,6 +7,7 @@ use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
+use App\Role;
 
 class AuthController extends Controller
 {
@@ -57,16 +58,24 @@ class AuthController extends Controller
 
     /**
      * Create a new user instance after a valid registration.
-     *
+     * 
      * @param  array  $data
      * @return User
      */
     protected function create(array $data)
     {
-        return User::create([
+        $create = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
         ]);
+        
+        $user = User::find($create->id);
+        
+        $role = Role::where('name', '=', 'sub')->firstOrFail();
+        
+        $user->roles()->attach($role->id);
+        
+        return $create;
     }
 }
