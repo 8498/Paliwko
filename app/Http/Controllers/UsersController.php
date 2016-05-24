@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\User;
 use App\Role;
+use Illuminate\Support\Facades\View;
 
 class UsersController extends Controller
 {
@@ -19,7 +20,7 @@ class UsersController extends Controller
     {
     	if(\Entrust::hasRole('admin'))
     	{
-        	$users = DB::table('users')->groupBy('name')->get();
+        	$users = DB::table('users')->leftjoin('role_user','id','=','role_user.user_id')->leftjoin('roles','role_id','=','roles.id')->select('users.name','users.email','users.id','roles.name as role_name')->groupBy('users.name')->get();
     	}
     	else
     	{
@@ -58,7 +59,9 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        //
+        $user = User::find($id);
+        
+        return view::make('users.show')->with('user', $user);
     }
 
     /**
@@ -69,13 +72,7 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-    	$user = User::find($id);
-    	$role = Role::where('name', '=', 'mod')->firstOrFail();
-        
-    	$user->detachRoles($user->roles);
-    	$user->roles()->attach($role->id);
-    	
-    	return view('home');
+  		//
     }
 
     /**
@@ -99,5 +96,28 @@ class UsersController extends Controller
     public function destroy($id)
     {
         //
+    }
+   	
+    public function giveModerator($id)
+    {
+    	$user = User::find($id);
+    	$role = Role::where('name', '=', 'mod')->firstOrFail();
+    	
+    	$user->detachRoles($user->roles);
+    	$user->roles()->attach($role->id);
+    	 
+    	//return view('home');
+    	return redirect()->back();
+    }
+    public function takeModerator($id)
+    {
+    	$user = User::find($id);
+    	$role = Role::where('name', '=', 'sub')->firstOrFail();
+    	
+    	$user->detachRoles($user->roles);
+    	$user->roles()->attach($role->id);
+    	 
+    	//return view('home');
+    	return redirect()->back();
     }
 }

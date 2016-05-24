@@ -1,7 +1,5 @@
 <?php
 
-use App\Position;
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -22,12 +20,12 @@ Route::get('/map', function() {
 	return view('map');
 });
 
-Route::get('/getRequest', function(){
+/*Route::get('/getRequest', function(){
 	if(Request::ajax())
 	{
 		return 'getRequest has loaded completely.';
 	}
-});
+});*/
 /*Route::post('/getCords', function() {
 	$data = Input::all();
 	if(Request::ajax())
@@ -45,10 +43,15 @@ Route::auth();
 
 Route::group(['middleware' => ['role:admin|mod']], function() {
 	Route::resource('users', 'UsersController');
+	
+	Route::get('users/{id}/giveModerator', 'UsersController@giveModerator');
+	
+	Route::get('users/{id}/takeModerator', 'UsersController@takeModerator');
 });
 /*Route::group(['middleware' => ['role:mod']], function() {
 	Route::resource('users', 'UsersController');
 });*/
+Route::resource('stations', 'StationsController');
 
 Route::get('/home', 'HomeController@index');
 

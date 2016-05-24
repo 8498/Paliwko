@@ -1,7 +1,6 @@
-@extends('layouts/app')
+@extends('layouts.app')
 
 @section('content')
-
 <div class="container">
 	<div class="panel panel-default">
     	<div class="panel-heading">Users</div>
@@ -10,6 +9,7 @@
         		<thead>
                 	<th>Name</th>
                 	<th>Email</th>
+                	<th>Uprawnienia</th>
             	</thead>
             	<tbody>
                 	@foreach ($users as $user)
@@ -22,10 +22,19 @@
                             <td class="table-text">
                             	<div>{{ $user->email }}</div>
                             </td>
-							@role('admin')
-                            <td>
-                            	<a class="btn btn-small btn-info" href="{{ URL::to('users/' . $user->id . '/edit') }}">Moderator</a>
+                            <td class="table-text">
+                            	<div>{{ $user->role_name }}</div>
                             </td>
+							@role('admin')
+                            @if($user->role_name == 'sub')
+                            <td>
+                            	<a class="btn btn-small btn-info" href="{{ URL::to('users/' . $user->id . '/giveModerator') }}">Nadanie Moderatora</a>
+                            </td>
+                            @elseif($user->role_name == 'mod')
+                            <td>
+                            	<a class="btn btn-small btn-info" href="{{ URL::to('users/' . $user->id . '/takeModerator') }}">Odebranie Moderatora</a>
+                            </td>
+                            @endif
                             @endrole
                         </tr>
                         @endforeach
@@ -34,5 +43,4 @@
         </div>
     </div> 
 </div>
-
 @endsection
