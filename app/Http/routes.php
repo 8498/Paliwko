@@ -15,7 +15,7 @@ Route::group(['middleware' => ['web']], function () {
 Route::get('/', function () {
     return view('welcome');
 });
-
+	
 Route::get('/map', function() {
 	return view('map');
 });
@@ -39,10 +39,22 @@ Route::get('/map', function() {
 	}
 });*/
 
+Route::resource('stations', 'StationsController');
+	
+Route::resource('users', 'UsersController');
+	
 Route::auth();
 
+Route::get('/home', 'HomeController@index');
+
 Route::group(['middleware' => ['role:admin|mod']], function() {
-	Route::resource('users', 'UsersController');
+	//Route::resource('users', 'UsersController');
+	
+	Route::get('/users','UsersController@index');
+	
+	Route::post('/users','UsersController@store');
+	
+	Route::get('/users/{id}','UsersController@show');
 	
 	Route::get('users/{id}/giveModerator', 'UsersController@giveModerator');
 	
@@ -51,8 +63,5 @@ Route::group(['middleware' => ['role:admin|mod']], function() {
 /*Route::group(['middleware' => ['role:mod']], function() {
 	Route::resource('users', 'UsersController');
 });*/
-Route::resource('stations', 'StationsController');
-
-Route::get('/home', 'HomeController@index');
 
 });

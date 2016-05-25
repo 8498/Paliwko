@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\DB;
 use App\User;
 use App\Role;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Redirect;
+//use App\Http\Controllers\Auth;
+use Illuminate\Support\Facades\Auth;
 
 class UsersController extends Controller
 {
@@ -59,7 +64,7 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        $user = User::find($id);
+        $user = User::findorfail($id);
         
         return view::make('users.show')->with('user', $user);
     }
@@ -72,7 +77,9 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-  		//
+  		$user = User::findorfail($id);
+
+  		return view::make('users.edit')->with('user',$user);
     }
 
     /**
@@ -84,7 +91,22 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+    	$this->validate($request, [
+    		'email' => 'required|email|max:50|unique:users,email',
+    		'password' => 'required|min:6',
+    	]);
+        	$user = User::find($id);
+        	
+        	$password = $request->input('password');
+        	
+        	if(Hash::check($password,Auth::user()->password))
+        	{
+        		$email = $request->input('email');
+        		DB::table('users')->where('id',$id)->update(['email'=>$email]);
+        		return view::make('users.show')->with('user', $user);
+        	}
+        
+        //return view::make('users.show')->with('user', $user);
     }
 
     /**
@@ -95,7 +117,11 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::findorfail($id);
+    	$user->delete();
+    	
+    	// redirect
+    	return Redirect::to('/logout');
     }
    	
     public function giveModerator($id)

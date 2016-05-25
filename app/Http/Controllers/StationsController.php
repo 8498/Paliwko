@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Redirect;
 use App\Station;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Input;
-use SebastianBergmann\Environment\Console;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
 
 class StationsController extends Controller
 {

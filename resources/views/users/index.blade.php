@@ -28,11 +28,11 @@
 							@role('admin')
                             @if($user->role_name == 'sub')
                             <td>
-                            	<a class="btn btn-small btn-info" href="{{ URL::to('users/' . $user->id . '/giveModerator') }}">Nadanie Moderatora</a>
+                            	<a class="btn btn-small btn-info" href="{{ URL::to('users/' . $user->id . '/giveModerator') }}">Nadanie Moderatora<i class="glyphicon glyphicon-arrow-up"></i></a>
                             </td>
                             @elseif($user->role_name == 'mod')
                             <td>
-                            	<a class="btn btn-small btn-info" href="{{ URL::to('users/' . $user->id . '/takeModerator') }}">Odebranie Moderatora</a>
+                            	<a class="btn btn-small btn-info" href="{{ URL::to('users/' . $user->id . '/takeModerator') }}">Odebranie Moderatora<i class="glyphicon glyphicon-arrow-down"></i></a>
                             </td>
                             @endif
                             @endrole
