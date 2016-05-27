@@ -1,5 +1,9 @@
 <?php
 
+
+
+use App\Station;
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -18,6 +22,13 @@ Route::get('/', function () {
 	
 Route::get('/map', function() {
 	return view('map');
+});
+Route::get('stations/fetch',function(){
+	if(Request::ajax())
+	{
+		$stations = DB::table('stations')->get();
+		return $stations;
+	}
 });
 
 /*Route::get('/getRequest', function(){

@@ -1,5 +1,21 @@
 @extends('layouts.app')
 
+@section('head')
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+<meta name="csrf-token" content="{{ csrf_token() }}" />
+
+<script src='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.js'></script>
+
+
+<link href='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.css' rel='stylesheet' />
+
+<style>
+	 #map1 { position:absolute; top:0; bottom:0; width:100%; }
+	 #map { height: 500px; width: 1200px; }
+</style>
+@endsection
+
 @section('content')
 
 <div class="container">

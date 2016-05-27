@@ -15,6 +15,8 @@ class CreateStationsTable extends Migration
     	Schema::create('stations', function (Blueprint $table) {
     		$table->increments('id');
     		$table->string('name');
+    		$table->float('latitude');
+    		$table->float('longtitude');
     		$table->rememberToken();
     		$table->timestamps();
     	});

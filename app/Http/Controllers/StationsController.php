@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Redirect;
 use App\Station;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Http\Response;
 
 class StationsController extends Controller
 {
@@ -49,6 +50,8 @@ class StationsController extends Controller
 	);*/
     	$station = new Station;
     	$station->name = $request->input('name');
+    	$station->latitude = $request->input('latitude');
+    	$station->longtitude = $request->input('longtitude');
     	$station->save();
     	
        return redirect::to('stations');
@@ -119,4 +122,8 @@ class StationsController extends Controller
     	// redirect
     	return Redirect::to('stations');
     }
+public function fetch(Request $request)
+{	
+		Response::json('ok');	
+}
 }
