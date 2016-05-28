@@ -29,7 +29,16 @@
 
                             <div class="col-md-6">
                                 <input type="name" class="form-control" name="name" >
-                                
+                            </div>
+                            
+                            <label class="col-md-4 control-label">Company</label>
+                            
+                            <div class="col-md-6">
+                                <select class="form-control" name="company">
+                                	@foreach ($stations as $station)
+  									<option>{{ $station->company_name }}</option>
+  									@endforeach
+								</select>
                             </div>
                         </div>
                      

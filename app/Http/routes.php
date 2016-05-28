@@ -60,6 +60,7 @@ Route::get('/home', 'HomeController@index');
 
 Route::group(['middleware' => ['role:admin|mod']], function() {
 	//Route::resource('users', 'UsersController');
+	Route::resource('companies', 'CompaniesController');
 	
 	Route::get('/users','UsersController@index');
 	

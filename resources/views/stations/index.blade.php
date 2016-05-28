@@ -7,11 +7,21 @@
 
 <script src='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.js'></script>
 
+<link rel="stylesheet" href="leaflet-routing-machine.css" />
+
+<script src="leaflet-routing-machine.js"></script>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 
 <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.24/vue.js'></script>
 
 <link href='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.css' rel='stylesheet' />
+
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css">
+
+<link rel="stylesheet" href="http://watson.lennardvoogdt.nl/Leaflet.awesome-markers/dist/leaflet.awesome-markers.css">
+
+<script src="http://watson.lennardvoogdt.nl/Leaflet.awesome-markers/dist/leaflet.awesome-markers.js"></script>
 
 <style>
 	 #map1 { position:absolute; top:0; bottom:0; width:100%; }
@@ -33,12 +43,17 @@
         	<table class="table table-striped task-table">
         		<thead>
                 	<th>Name</th>
+                	<th>Firma</th>
             	</thead>
             	<tbody>
                 	@foreach ($stations as $station)
                     	<tr>
                             <td class="table-text">
                             	<div>{{ $station->name }}</div>
+                            </td>
+                            
+                            <td class="table-text">
+                            	<div>{{ $station->company_name }}</div>
                             </td>
                             
                             @if(Auth::check())
@@ -52,7 +67,7 @@
         	</table>
         	@if(Auth::check())
         	<!-- <a class="btn btn-small btn-info" href="{{ URL::to('stations/create') }}">Dodaj stacje</a>-->
-        	<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Dodaj stacje</button>
+        	<button id="addStation" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" >Dodaj stacje</button>
         	@endif
         </div>
     </div> 
@@ -79,8 +94,18 @@
 
                             <div class="col-md-6">
                                 <input type="name" class="form-control" name="name" >
-                                
                             </div>
+                            
+                            <label class="col-md-4 control-label">Company</label>
+                            
+                            <div class="col-md-6">
+                                <select class="form-control" name="company">
+                                	@foreach ($companies as $company)
+  									<option value="{{ $company->id }}">{{ $company->name }}</option>
+  									@endforeach
+								</select>
+                            </div>
+                            
                         </div>
                      
 
@@ -101,6 +126,16 @@
 </div>
 
 <script type="text/javascript">
+
+function getColor(color)
+{
+	return {icon: L.AwesomeMarkers.icon({icon: 'flag',  prefix: 'glyphicon',markerColor: color})};
+}
+
+$(document).ready(function() {
+    $('#addStation').prop('disabled', true);
+});
+
 $.ajaxSetup({
 	 headers: {
 		 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -117,22 +152,6 @@ var map = L.map('map')
     .addLayer(mapboxTiles)
 	
 	map.locate({setView: true,maxZoom: 16});//watch:true
-
-	$(document).ready(function() {
-		  $.ajax({
-	            type: "GET",
-	            url: '/stations/fetch',
-	            datatype: "JSON",   
-	            success: function( response ) {
-	            	console.log(Object.keys(response).length);
-	            	response.forEach(function(data) {
-	            	      L.marker([data.latitude,data.longtitude]).bindPopup(data.name).addTo(map);
-	            	      console.log(data);
-	            	   });
-	            }
-	        });
-	        console.log(typeof(id));
-	});
 	
 	var markerUser = null;
 
@@ -142,19 +161,22 @@ var map = L.map('map')
 
 	var lng2 = null;
 
+	var latlngUser = null;
+
 	map.on('locationfound', function (e) {
 
-		var radius = e.accuracy / 3;
+		var radius = e.accuracy / 4;
 		
 		if(markerUser !== null && circle !== null) {
 			map.removeLayer(markerUser);
 			map.removeLayer(circle);
 			}
 			markerUser = L.marker(e.latlng).addTo(map);
-
 			lat2 = e.latlng.lat;
 			lng2 = e.latlng.lng;
-									
+			latlngUser = e.latlng;
+
+			
 
 		/* var dataString = "latitude="+lat+"&lng="+lng;
 
@@ -172,6 +194,37 @@ var map = L.map('map')
 	
 			circle = L.circle(e.latlng, radius).addTo(map);
 });
+
+	
+	
+	$(document).ready(function() {
+		  $.ajax({
+	            type: "GET",
+	            url: '/stations/fetch',
+	            datatype: "JSON",   
+	            success: function( response ) {
+	            	console.log(Object.keys(response).length);
+	            	response.forEach(function(data) {
+	            	      var stationMarker = L.marker([data.latitude,data.longtitude],getColor('green')).bindPopup(data.name);
+	            	      stationMarker.on('click', function (e) {
+	            	    	  L.Routing.control({
+	            	    		  waypoints: [
+	            	    		    L.latLng(e.latlng),
+	            	    		    L.latLng(latlngUser)
+	            	    		  ],
+	            	    		  draggableWaypoints: false,
+	            	    		  addWaypoints: false,
+	            	    		  reverseWaypoints: true,
+	            	    		  show: false
+	            	    		}).addTo(map);
+	            	      });
+	            	      stationMarker.addTo(map);
+	            	      console.log(data);
+	            	   });
+	            }
+	        });
+	        console.log(typeof(id));
+	});	
 	
 	function onLocationError(e) {
     alert(e.message);
@@ -219,6 +272,7 @@ var map = L.map('map')
 	
 		map.on('click', sendKords);*/
 
+		
 		var kord = new Vue({
 			el:'#kord',
 			data:{
@@ -240,11 +294,12 @@ var map = L.map('map')
 				map.removeLayer(marker);
 				console.log(marker.getLatLng());
 			}
-	        marker = L.marker(e.latlng).addTo(map);
+	        marker = L.marker(e.latlng,{icon: L.AwesomeMarkers.icon({icon: 'star',  prefix: 'glyphicon',markerColor: 'cadetblue'})}).addTo(map);
+	        $('#addStation').prop('disabled', false);
 		}
 		
-		
 		map.on('click', sendKords);
+		
 	/*function onClick(e) { 
 			var latitude = e.latlng.lat;
 			var longtitude = e.latlng.lng;

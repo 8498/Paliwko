@@ -11,6 +11,7 @@ use App\Station;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Response;
+use App\Company;
 
 class StationsController extends Controller
 {
@@ -21,9 +22,14 @@ class StationsController extends Controller
      */
     public function index()
     {
-        $stations = DB::table('stations')->groupBy('name')->get();
+        $stations = DB::table('stations')->leftjoin('company_station','id','=','company_station.station_id')
+        ->leftjoin('companies','company_id','=','companies.id')
+        ->select('stations.name','stations.id','companies.name as company_name', 'companies.id as company_id')
+        ->groupBy('stations.name')->get();
         
-        return view('stations.index', ['stations' => $stations]);
+        $companies = DB::table('companies')->select('id','name')->get();
+        
+        return view('stations.index', ['stations' => $stations,'companies' => $companies]);
     }
 
     /**
@@ -48,11 +54,15 @@ class StationsController extends Controller
     	
     	DB::table('stations')->insert(['name' => $name]
 	);*/
+    	
     	$station = new Station;
     	$station->name = $request->input('name');
     	$station->latitude = $request->input('latitude');
     	$station->longtitude = $request->input('longtitude');
-    	$station->save();
+    	
+    	$company = Company::find($request->input('company'));
+    	
+    	$company->stations()->save($station);
     	
        return redirect::to('stations');
     }

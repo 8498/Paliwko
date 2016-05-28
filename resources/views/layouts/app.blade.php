@@ -50,13 +50,14 @@
                 <!-- Left Side Of Navbar -->
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url('/home') }}"><i class="glyphicon glyphicon-home"></i></a></li>
-                    <li><a href="{{ url('/map') }}">Map</a>
                     @if (Auth::check())
                     	@role('admin')
     						<li><a href="{{ url('/users') }}">Uzytkownicy</a>
+    						<li><a href="{{ url('/companies') }}">Firmy</a>
 						@endrole
 						@role('mod')
     						<li><a href="{{ url('/users') }}">Uzytkownicy</a>
+    						<li><a href="{{ url('/companies') }}">Firmy</a>
 						@endrole
 							<li><a href="{{ url('/stations') }}">Stacje</a>
                     @endif
