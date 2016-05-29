@@ -13,6 +13,7 @@ class CompaniesTableSeeder extends Seeder
     {
         DB::table('companies')->insert([
     			'name' => 'Nieokreslona',
+        		'color' => 'green',
     	]);
     }
 }

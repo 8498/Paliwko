@@ -2,7 +2,8 @@
 
 
 
-use App\Station;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -23,12 +24,17 @@ Route::get('/', function () {
 Route::get('/map', function() {
 	return view('map');
 });
+
 Route::get('stations/fetch',function(){
-	if(Request::ajax())
-	{
-		$stations = DB::table('stations')->get();
-		return $stations;
-	}
+			if(Request::ajax())
+			{
+				$stations = DB::table('stations')->leftjoin('company_station','id','=','company_station.station_id')
+				->leftjoin('companies','company_id','=','companies.id')->where('stations.verify','=','true')
+				->select('stations.name','stations.id','stations.latitude','stations.longtitude','companies.name as company_name', 'companies.id as company_id', 'companies.color')
+				->get();
+				return $stations;
+			}
+		
 });
 
 /*Route::get('/getRequest', function(){
@@ -67,6 +73,8 @@ Route::group(['middleware' => ['role:admin|mod']], function() {
 	Route::post('/users','UsersController@store');
 	
 	Route::get('/users/{id}','UsersController@show');
+	
+	Route::get('stations/{id}/verify', 'StationsController@verify');
 	
 	Route::get('users/{id}/giveModerator', 'UsersController@giveModerator');
 	

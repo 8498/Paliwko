@@ -45,6 +45,7 @@ class CompaniesController extends Controller
     {
         $company = new Company;
     	$company->name = $request->input('name');
+    	$company->color = $request->input('color');
     	$company->save();
     	
        return redirect::to('companies');
@@ -85,6 +86,7 @@ class CompaniesController extends Controller
     {
     	$company = Company::find($id);
     	$company->name = $request->input('name');
+    	$company->color = $request->input('color');
     	$company->save();
     	
     	return Redirect::to('companies');

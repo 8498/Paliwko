@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -67,8 +67,8 @@
                 <ul class="nav navbar-nav navbar-right">
                     <!-- Authentication Links -->
                     @if (Auth::guest())
-                        <li><a href="{{ url('/login') }}">Login</a></li>
-                        <li><a href="{{ url('/register') }}">Register</a></li>
+                        <li><a href="{{ url('/login') }}">Zaloguj</a></li>
+                        <li><a href="{{ url('/register') }}">Rejestruj</a></li>
                     @else
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -77,7 +77,7 @@
                             
                             <ul class="dropdown-menu" role="menu">
                             	<li><a href="{{ URL::to('users/' . Auth::user()->id) }}"><i class="glyphicon glyphicon-user"></i>Profil</a></li>
-                                <li><a href="{{ url('/logout') }}"><i class="glyphicon glyphicon-off"></i>Logout</a></li>
+                                <li><a href="{{ url('/logout') }}"><i class="glyphicon glyphicon-off"></i>Wyloguj</a></li>
                             </ul>
                         </li>
                     @endif

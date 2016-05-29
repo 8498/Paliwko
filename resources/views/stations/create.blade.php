@@ -25,13 +25,13 @@
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
                         <div class="form-group">
-                            <label class="col-md-4 control-label">Name</label>
+                            <label class="col-md-4 control-label">Nazwa</label>
 
                             <div class="col-md-6">
                                 <input type="name" class="form-control" name="name" >
                             </div>
                             
-                            <label class="col-md-4 control-label">Company</label>
+                            <label class="col-md-4 control-label">Firma</label>
                             
                             <div class="col-md-6">
                                 <select class="form-control" name="company">

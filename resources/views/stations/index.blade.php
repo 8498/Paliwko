@@ -30,19 +30,26 @@
 @endsection
 
 @section('content')
-<input type="submit" value="Submit" id="x"/>
-<div id="messages"></div>
 <div class="container">
+	<div class="panel panel-default">
+    	<div class="panel-heading">Legenda</div>
+    		<div class="panel-body">
+    		@foreach ($companies as $company)
+    		<p style="color:{{ $company->color }}">{{ $company->name }}</p>
+    		@endforeach
+    		</div>
+    </div>
 	<div class="panel-body">
 		<div id='map' class="col-md-6"></div>
 	</div>
 	
 	<div class="panel panel-default">
-    	<div class="panel-heading">Stations</div>
+    	<div class="panel-heading">Stacje</div>
     	<div class="panel-body">
+    		@role('admin' , 'mod')
         	<table class="table table-striped task-table">
         		<thead>
-                	<th>Name</th>
+                	<th>Nazwa</th>
                 	<th>Firma</th>
             	</thead>
             	<tbody>
@@ -58,20 +65,26 @@
                             
                             @if(Auth::check())
                             <td>
-                            	<a class="btn btn-small btn-info" href="{{ URL::to('stations/' . $station->id . '/edit') }}">Edit</a>
-                            </td>                  
+                            	<a class="btn btn-small btn-info" href="{{ URL::to('stations/' . $station->id . '/edit') }}">Edytuj</a>
+                            </td>  
+    						@if($station->verify == 'false')
+                            <td>
+                            	<a class="btn btn-small btn-info" href="{{ URL::to('stations/' . $station->id . '/verify') }}">Verify</a>
+                            </td> 
+                            @endif         
                            @endif
                         </tr>
                         @endforeach
-                </tbody>
-        	</table>
-        	@if(Auth::check())
+                	</tbody>
+        		</table>
+        		@endrole
+        		@if(Auth::check())
         	<!-- <a class="btn btn-small btn-info" href="{{ URL::to('stations/create') }}">Dodaj stacje</a>-->
-        	<button id="addStation" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" >Dodaj stacje</button>
-        	@endif
+        		<button id="addStation" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" >Dodaj stacje</button>
+        		@endif
         </div>
-    </div> 
-</div>
+    </div>
+	</div>
 
 <div id="myModal" class="modal fade" role="dialog">
   	<div class="modal-dialog">
@@ -90,13 +103,13 @@
 						
 						
                         <div class="form-group">
-                            <label class="col-md-4 control-label">Name</label>
+                            <label class="col-md-4 control-label">Nazwa</label>
 
                             <div class="col-md-6">
                                 <input type="name" class="form-control" name="name" >
                             </div>
                             
-                            <label class="col-md-4 control-label">Company</label>
+                            <label class="col-md-4 control-label">Firma</label>
                             
                             <div class="col-md-6">
                                 <select class="form-control" name="company">
@@ -105,14 +118,19 @@
   									@endforeach
 								</select>
                             </div>
-                            
+                            @role('admin', 'mod')
+                            <input type="hidden" class="form-control" name="verify" value="true" >
+                            @endrole
+                            @role('sub')
+                            <input type="hidden" class="form-control" name="verify" value="false">
+                            @endrole
                         </div>
                      
 
                         <div class="form-group">
                             <div class="col-md-6 col-md-offset-4">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fa fa-btn fa-sign-in"></i>Dodaj
+                                    <i class="glyphicon glyphicon-plus"></i>Dodaj
                                 </button>
                             </div>
                         </div>
@@ -147,11 +165,10 @@ L.mapbox.accessToken = 'pk.eyJ1IjoicGxveHFxIiwiYSI6ImNpbzh3czQzcTAwOHh1c2tuejFjM
 var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
     attribution: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 });
-
 var map = L.map('map')
     .addLayer(mapboxTiles)
 	
-	map.locate({setView: true,maxZoom: 16});//watch:true
+	map.locate({setView: true, maxZoom: 16});//watch:true
 	
 	var markerUser = null;
 
@@ -175,22 +192,6 @@ var map = L.map('map')
 			lat2 = e.latlng.lat;
 			lng2 = e.latlng.lng;
 			latlngUser = e.latlng;
-
-			
-
-		/* var dataString = "latitude="+lat+"&lng="+lng;
-
-			$.ajax({
-				method: "POST",
-				url: "getCords",
-				data: dataString,
-				succes: function(data){
-					console.log(data);
-					},
-				error: function(data){
-					console.log(data);
-				}
-			}); */
 	
 			circle = L.circle(e.latlng, radius).addTo(map);
 });
@@ -205,7 +206,7 @@ var map = L.map('map')
 	            success: function( response ) {
 	            	console.log(Object.keys(response).length);
 	            	response.forEach(function(data) {
-	            	      var stationMarker = L.marker([data.latitude,data.longtitude],getColor('green')).bindPopup(data.name);
+	            	      var stationMarker = L.marker([data.latitude,data.longtitude],getColor(data.color)).bindPopup(data.name);
 	            	      stationMarker.on('click', function (e) {
 	            	    	  L.Routing.control({
 	            	    		  waypoints: [
@@ -232,56 +233,12 @@ var map = L.map('map')
 
 	map.on('locationerror', onLocationError);
 
-	$(document).ready(function (){
-		$('#getRequest').click(function(){
-		$.get('getRequest', function (data){
-			console.log(data);
-			});
-		});
-		});
-	
-		/*map.on('click', function(e) {
-		var latitude = e.latlng.lat;
-		var longtitude = e.latlng.lng;
-		var kord = new Vue({
-			el:'#kord',
-			data:{
-				lat: latitude,
-				lng: longtitude},
-				created: function () {
-				    // `this` points to the vm instance
-				    console.log('lat: ' + latitude + ' long: ' + longtitude)
-				  }
-		})
-	});*/
-
-		/*function sendKords(e) { 
-			var lat = e.latlng.lat;
-			var lng = e.latlng.lng;
-			var kord1 = new Vue({
-				el:'#kord',
-				data:{
-					latitude: lat,
-					longtitude: lng},
-					created: function () {
-					    // `this` points to the vm instance
-					    console.log('lat: ' + lat + ' long: ' + lng)
-					  }
-			})
-			}
-	
-		map.on('click', sendKords);*/
-
 		
 		var kord = new Vue({
 			el:'#kord',
 			data:{
 				latitude: '',
-				longtitude: ''}/*,
-				created: function () {
-				    // `this` points to the vm instance
-				    console.log('lat: ' + latitude + ' long: ' + longtitude)
-				  }*/
+				longtitude: ''}
 		})
 
 		var marker = null;
@@ -299,33 +256,6 @@ var map = L.map('map')
 		}
 		
 		map.on('click', sendKords);
-		
-	/*function onClick(e) { 
-			var latitude = e.latlng.lat;
-			var longtitude = e.latlng.lng;
-			var kord = new Vue({
-				el:'#kord',
-				data:{
-					lat: latitude,
-					lng: longtitude}
-			})}
-	map.on('click', onClick);*/
-	
-	/*new Vue({
-
-	    ready: function() {
-
-	      var resource = this.$resource('stations{/id}');
-
-	      // get item
-	      resource.get({id: 1}).then(function (response) {
-	          this.$set('item', response.item)
-	          console.log(response.item);
-	      });
-	     
-	    }
-
-	})*/
 </script>
 
 @endsection

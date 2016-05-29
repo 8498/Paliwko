@@ -10,7 +10,7 @@
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
                         <div class="form-group">
-                            <label class="col-md-4 control-label">Name</label>
+                            <label class="col-md-4 control-label">Nazwa</label>
 
                             <div class="col-md-6">
                                 <input type="name" class="form-control" name="name" >
@@ -20,7 +20,7 @@
                         <div class="form-group">
                             <div class="col-md-6 col-md-offset-4">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fa fa-btn fa-sign-in"></i>Edytuj
+                                    Edytuj
                                 </button>
                             </div>
                         </div>
@@ -29,7 +29,7 @@
                     	<input type="hidden" name="_method" value="DELETE">
                     	<input type="hidden" name="_token" value="{{ csrf_token() }}">
                     	<button type="submit" class="btn btn-primary">
-                    		<i class="fa fa-btn fa-sign-in"></i>DELETE
+                    		<i class="glyphicon glyphicon-trash"></i>Usun
                     	</button>
                     </form>
 </div>

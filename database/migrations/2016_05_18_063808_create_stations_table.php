@@ -17,6 +17,7 @@ class CreateStationsTable extends Migration
     		$table->string('name');
     		$table->float('latitude');
     		$table->float('longtitude');
+    		$table->string('verify');
     		$table->rememberToken();
     		$table->timestamps();
     	});

@@ -7,7 +7,7 @@
     	<div class="panel-body">
         	<table class="table table-striped task-table">
         		<thead>
-                	<th>Name</th>
+                	<th>Nazwa</th>
                 	<th>Email</th>
                 	<th>Uprawnienia</th>
             	</thead>

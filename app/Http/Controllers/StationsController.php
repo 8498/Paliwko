@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Response;
 use App\Company;
+use Auth;
 
 class StationsController extends Controller
 {
@@ -22,12 +23,22 @@ class StationsController extends Controller
      */
     public function index()
     {
-        $stations = DB::table('stations')->leftjoin('company_station','id','=','company_station.station_id')
-        ->leftjoin('companies','company_id','=','companies.id')
-        ->select('stations.name','stations.id','companies.name as company_name', 'companies.id as company_id')
-        ->groupBy('stations.name')->get();
+    	if(Auth::user()->hasRole('sub'))
+    	{
+	        $stations = DB::table('stations')->leftjoin('company_station','id','=','company_station.station_id')
+	        ->leftjoin('companies','company_id','=','companies.id')->where('stations.verify','=','true')
+	        ->select('stations.name','stations.id','companies.name as company_name', 'companies.id as company_id', 'companies.color')
+	        ->groupBy('stations.name')->get();
+    	}
+    	else 
+    	{
+    		$stations = DB::table('stations')->leftjoin('company_station','id','=','company_station.station_id')
+    		->leftjoin('companies','company_id','=','companies.id')
+    		->select('stations.name','stations.id','stations.verify','companies.name as company_name', 'companies.id as company_id', 'companies.color')
+    		->groupBy('stations.name')->get();
+    	}
         
-        $companies = DB::table('companies')->select('id','name')->get();
+        $companies = DB::table('companies')->select('id','name','color')->get();
         
         return view('stations.index', ['stations' => $stations,'companies' => $companies]);
     }
@@ -59,6 +70,7 @@ class StationsController extends Controller
     	$station->name = $request->input('name');
     	$station->latitude = $request->input('latitude');
     	$station->longtitude = $request->input('longtitude');
+    	$station->verify = $request->input('verify');
     	
     	$company = Company::find($request->input('company'));
     	
@@ -132,8 +144,16 @@ class StationsController extends Controller
     	// redirect
     	return Redirect::to('stations');
     }
-public function fetch(Request $request)
-{	
-		Response::json('ok');	
-}
+    public function verify($id)
+    {
+    	$station = Station::find($id);
+    	$station->verify = 'true';
+    	$station->save();
+    	
+    	return redirect()->back();
+    }
+	public function fetch(Request $request)
+	{	
+			Response::json('ok');	
+	}
 }
