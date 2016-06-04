@@ -27,14 +27,14 @@ class StationsController extends Controller
     	{
 	        $stations = DB::table('stations')->leftjoin('company_station','id','=','company_station.station_id')
 	        ->leftjoin('companies','company_id','=','companies.id')->where('stations.verify','=','true')
-	        ->select('stations.name','stations.id','companies.name as company_name', 'companies.id as company_id', 'companies.color')
+	        ->select('stations.name','stations.id','companies.name as company_name', 'companies.id as company_id', 'companies.color','stations.LPG','stations.ON','stations.PB95','stations.PB98')
 	        ->groupBy('stations.name')->get();
     	}
     	else 
     	{
     		$stations = DB::table('stations')->leftjoin('company_station','id','=','company_station.station_id')
     		->leftjoin('companies','company_id','=','companies.id')
-    		->select('stations.name','stations.id','stations.verify','companies.name as company_name', 'companies.id as company_id', 'companies.color')
+    		->select('stations.name','stations.id','stations.verify','companies.name as company_name', 'companies.id as company_id', 'companies.color','stations.LPG','stations.ON','stations.PB95','stations.PB98')
     		->groupBy('stations.name')->get();
     	}
         
@@ -73,6 +73,10 @@ class StationsController extends Controller
     	$station->name = $request->input('name');
     	$station->latitude = $request->input('latitude');
     	$station->longtitude = $request->input('longtitude');
+    	$station->LPG = $request->input('lpg');
+    	$station->ON = $request->input('on');
+    	$station->PB95 = $request->input('pb95');
+    	$station->PB98 = $request->input('pb98');
     	$station->verify = $request->input('verify');
     	
     	$company = Company::find($request->input('company'));
@@ -132,6 +136,10 @@ class StationsController extends Controller
     	
     	$station = Station::find($id);
     	$station->name = $request->input('name');
+    	$station->LPG = $request->input('lpg');
+    	$station->ON = $request->input('on');
+    	$station->PB95 = $request->input('pb95');
+    	$station->PB98 = $request->input('pb98');
     	$station->save();
     	//Input::get('name');
     	return Redirect::to('stations');

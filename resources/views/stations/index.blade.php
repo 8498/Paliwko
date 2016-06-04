@@ -35,14 +35,15 @@
 
 @section('content')
 <div class="container">
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<div class="panel-body">
-				<form class="form-horizontal">
-				
-					<div class="form-group">
-						<div class="col-md-6">
-							<label class="col-md-4 control-label">Firma</label>
+
+<div id="filtrModal" class="modal fade" role="dialog">
+  	<div class="modal-dialog">
+    	<div class="modal-content">
+      		<div class="modal-header">
+        		<h4 class="modal-title">Filtr</h4>
+      		</div>
+      		<div  class="modal-body">
+							<label class="col-md-4 control-label">Wybierz jakiej firmy stacje chcesz zobaczyc:</label>
 							
 							<select id="company" class="form-control">
 								<option value="wszystkie">Wszystkie</option>
@@ -50,24 +51,24 @@
 	  							<option value="{{ $company->name }}">{{ $company->name }}</option>
 	  							@endforeach
 							</select>
-						
-							<button id="filtr" type="button" class="btn btn-primary">
+							
+							<div class="modal-footer">
+								<button id="filtr" type="button" class="btn btn-primary">
                                    Pokaz
-                            </button>
-						</div>
-					</div>
-				</form>
-			</div>
+                            	</button>
+                            </div>
+      		</div>
 		</div>
 	</div>
+</div>
 
 	<div class="panel panel-default">
     	<div class="panel-heading">Legenda</div>
     		<div class="panel-body">
-    		@foreach ($companies as $company)
-    		<p style="color:{{ $company->color }}">{{ $company->name }}</p>
-    		@endforeach
-    		</div>
+    			@foreach ($companies as $company)
+    			<p style="color:{{ $company->color }}">{{ $company->name }}</p>
+    			@endforeach
+    	</div>
     </div>
 	<div class="panel-body">
 		<div id='map' class="col-md-6"></div>
@@ -81,6 +82,10 @@
         		<thead>
                 	<th>Nazwa</th>
                 	<th>Firma</th>
+                	<th>LPG</th>
+                	<th>ON</th>
+                	<th>PB95</th>
+                	<th>PB98</th>
             	</thead>
             	<tbody>
                 	@foreach ($stations as $station)
@@ -91,6 +96,18 @@
                             
                             <td class="table-text">
                             	<div>{{ $station->company_name }}</div>
+                            </td>
+                            <td class="table-text">
+                            	<div>{{ $station->LPG }}</div>
+                            </td>
+                            <td class="table-text">
+                            	<div>{{ $station->ON }}</div>
+                            </td>
+                            <td class="table-text">
+                            	<div>{{ $station->PB95 }}</div>
+                            </td>
+                            <td class="table-text">
+                            	<div>{{ $station->PB98 }}</div>
                             </td>
                             
                             @if(Auth::check())
@@ -145,6 +162,30 @@
                                 @endif
                             </div>
                             
+                            <label class="col-md-4 control-label">LPG</label>
+
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" name="lpg" >
+                            </div>
+                            
+                            <label class="col-md-4 control-label">ON</label>
+
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" name="on" >
+                            </div>
+                            
+                            <label class="col-md-4 control-label">Pb95</label>
+
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" name="pb95" >
+                            </div>
+                            
+                            <label class="col-md-4 control-label">Pb98</label>
+
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" name="pb98" >
+                            </div>
+                            
                             <label class="col-md-4 control-label">Firma</label>
                             
                             <div class="col-md-6">
@@ -181,211 +222,12 @@
 
 <script type="text/javascript">
 
-
-
 $(document).ready(function() {
     $('#addStation').prop('disabled', true);
+    $("#filtrModal").modal({backdrop: false});
 });
-
-$.ajaxSetup({
-	 headers: {
-		 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-	 }
-	});
-
-document.getElementById("filtr").addEventListener("click", filtrfun);
-function filtrfun()
-{
-	function getColor(color)
-	{
-		return {icon: L.AwesomeMarkers.icon({icon: 'flag',  prefix: 'glyphicon',markerColor: color})};
-	}
-L.mapbox.accessToken = 'pk.eyJ1IjoicGxveHFxIiwiYSI6ImNpbzh3czQzcTAwOHh1c2tuejFjMHFzNWEifQ.e7p65gm0vPLir5gtCFWJZQ';
-// Replace 'mapbox.streets' with your map id.
-var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
-    attribution: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-});
-var map = L.map('map')
-    .addLayer(mapboxTiles)
-	
-	map.locate({setView: true, maxZoom: 16});//watch:true
-	
-	var markerUser = null;
-
-	var circle = null;
-
-	var lat2 = null;
-
-	var lng2 = null;
-
-	var latlngUser = null;
-
-	map.on('locationfound', function (e) {
-
-		var radius = e.accuracy / 4;
-		
-		if(markerUser !== null && circle !== null) {
-			map.removeLayer(markerUser);
-			map.removeLayer(circle);
-			}
-			markerUser = L.marker(e.latlng).addTo(map);
-			lat2 = e.latlng.lat;
-			lng2 = e.latlng.lng;
-			latlngUser = e.latlng;
-	
-			circle = L.circle(e.latlng, radius).addTo(map);
-
-			L.easyButton('fa-crosshairs fa-lg', function(btn, map){
-				map.setView(e.latlng);
-			}).addTo(map);
-});
-
-	
-	
-	/*$(document).ready(function() 
-			{
-		  $.ajax({
-	            type: "GET",
-	            url: '/stations/fetch',
-	            datatype: "JSON",   
-	            success: function( response ) {
-	            	console.log(Object.keys(response).length);
-	            	response.forEach(function(data) {
-	            	      var stationMarker = L.marker([data.latitude,data.longtitude],getColor(data.color)).bindPopup("nazwa: "+data.name+"<br>"+" firma: "+data.company_name);
-	            	      stationMarker.on('mouseover',function (e){
-		            	      this.openPopup();
-		            	      });
-	            	      stationMarker.on('mouseout',function (e){
-		            	      this.closePopup();
-		            	      });
-	            	      stationMarker.on('click', function (e) {
-	            	    	  L.Routing.control({
-	            	    		  waypoints: [
-	            	    		    L.latLng(e.latlng),
-	            	    		    L.latLng(latlngUser)
-	            	    		  ],
-	            	    		  draggableWaypoints: false,
-	            	    		  addWaypoints: false,
-	            	    		  reverseWaypoints: true,
-	            	    		  show: false
-	            	    		}).addTo(map);
-	            	      });
-	            	      stationMarker.addTo(map);
-	            	      console.log(data);
-	            	   });
-	            }
-	        });
-	        console.log(typeof(id));
-	});	*/
-
-	
-
-		var stationMarker = null;
-		console.log(document.getElementById("company").value);
-		$.ajax({
-            type: "GET",
-            url: '/stations/fetch',
-            datatype: "JSON",   
-            success: function( response ) {
-            	console.log(Object.keys(response).length);
-            	response.forEach(function(data) {
-
-					console.log(data.company_name);
-					console.log(document.getElementById("company").value);
-					if(data.company_name === document.getElementById("company").value){
-						console.log("tak");
-						stationMarker = L.marker([data.latitude,data.longtitude],getColor(data.color)).bindPopup("nazwa: "+data.name+"<br>"+" firma: "+data.company_name);
-						stationMarker.on('mouseover',function (e){
-		            	      this.openPopup();
-		            	      });
-	            	      stationMarker.on('mouseout',function (e){
-		            	      this.closePopup();
-		            	      });
-	            	      stationMarker.on('click', function (e) {
-	            	    	  L.Routing.control({
-	            	    		  waypoints: [
-	            	    		    L.latLng(e.latlng),
-	            	    		    L.latLng(latlngUser)
-	            	    		  ],
-	            	    		  draggableWaypoints: false,
-	            	    		  addWaypoints: false,
-	            	    		  reverseWaypoints: true,
-	            	    		  show: false
-	            	    		}).addTo(map);
-	            	      });
-	            	      stationMarker.addTo(map);
-	            	      console.log(data);
-						}
-					else if("wszystkie" === document.getElementById("company").value){
-						console.log("nie");
-						stationMarker = L.marker([data.latitude,data.longtitude],getColor(data.color)).bindPopup("nazwa: "+data.name+"<br>"+" firma: "+data.company_name);
-						stationMarker.on('mouseover',function (e){
-		            	      this.openPopup();
-		            	      });
-	            	      stationMarker.on('mouseout',function (e){
-		            	      this.closePopup();
-		            	      });
-	            	      stationMarker.on('click', function (e) {
-	            	    	  L.Routing.control({
-	            	    		  waypoints: [
-	            	    		    L.latLng(e.latlng),
-	            	    		    L.latLng(latlngUser)
-	            	    		  ],
-	            	    		  draggableWaypoints: false,
-	            	    		  addWaypoints: false,
-	            	    		  reverseWaypoints: true,
-	            	    		  show: false
-	            	    		}).addTo(map);
-	            	      });
-	            	      stationMarker.addTo(map);
-	            	      console.log(data);
-						}
-						
-                	/*if(document.getElementById("company").value = "wszyscy")
-                	{
-                		stationMarker = L.marker([data.latitude,data.longtitude],getColor(data.color)).bindPopup("nazwa: "+data.name+"<br>"+" firma: "+data.company_name);
-                    }
-                	else if(data.company_name = document.getElementById("company").value)
-                	{
-                		stationMarker = L.marker([data.latitude,data.longtitude],getColor(data.color)).bindPopup("nazwa: "+data.name+"<br>"+" firma: "+data.company_name);
-                	}*/
-            	      
-            	      
-            	   });
-            }
-        });
-        console.log(typeof(id));
-	
-	
-	function onLocationError(e) {
-    alert(e.message);
-	}
-	
-	map.on('locationerror', onLocationError);
-		
-		var kord = new Vue({
-			el:'#kord',
-			data:{
-				latitude: '',
-				longtitude: ''}
-		})
-
-		var marker = null;
-		console.log(marker);
-		function sendKords(e) { 
-			kord.latitude = e.latlng.lat;
-			kord.longtitude = e.latlng.lng;
-			if(marker !== null)
-			{
-				map.removeLayer(marker);
-				console.log(marker.getLatLng());
-			}
-	        marker = L.marker(e.latlng,{icon: L.AwesomeMarkers.icon({icon: 'star',  prefix: 'glyphicon',markerColor: 'cadetblue'})}).addTo(map);
-	        $('#addStation').prop('disabled', false);
-		}
-		
-		map.on('click', sendKords);
-}
 </script>
+
+<script src="map-script.js"></script>
 
 @endsection

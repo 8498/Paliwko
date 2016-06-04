@@ -30,7 +30,7 @@ Route::get('stations/fetch',function(){
 			{
 				$stations = DB::table('stations')->leftjoin('company_station','id','=','company_station.station_id')
 				->leftjoin('companies','company_id','=','companies.id')->where('stations.verify','=','true')
-				->select('stations.name','stations.id','stations.latitude','stations.longtitude','companies.name as company_name', 'companies.id as company_id', 'companies.color')
+				->select('stations.name','stations.id','stations.latitude','stations.longtitude','companies.name as company_name', 'companies.id as company_id', 'companies.color', 'stations.LPG as LPG', 'stations.ON as ON', 'stations.PB95 as PB95', 'stations.PB98 as PB98')
 				->get();
 				return $stations;
 			}

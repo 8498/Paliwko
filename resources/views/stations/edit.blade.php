@@ -21,6 +21,30 @@
                                     </span>
                                 @endif
                             </div>
+                            
+                            <label class="col-md-4 control-label">LPG</label>
+
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" name="lpg" >
+                            </div>
+                            
+                            <label class="col-md-4 control-label">ON</label>
+
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" name="on" >
+                            </div>
+                            
+                            <label class="col-md-4 control-label">Pb95</label>
+
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" name="pb95" >
+                            </div>
+                            
+                            <label class="col-md-4 control-label">Pb98</label>
+
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" name="pb98" >
+                            </div>
                         </div>
                      
                         <div class="form-group">
