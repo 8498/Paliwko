@@ -58,6 +58,12 @@
 
                             <div class="col-md-6">
                                 <input type="name" class="form-control" name="name" >
+                                
+                                @if ($errors->has('name'))
+                                    <span class="help-block">
+                                        <strong>{{ $errors->first('name') }}</strong>
+                                    </span>
+                                @endif
                             </div>
                         </div>
                      

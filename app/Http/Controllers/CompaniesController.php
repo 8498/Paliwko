@@ -43,6 +43,11 @@ class CompaniesController extends Controller
      */
     public function store(Request $request)
     {
+    	$this->validate($request, [
+    			'name' => 'required|unique:companies|min:4',
+    			'color' => 'required',
+    	]);
+    	
         $company = new Company;
     	$company->name = $request->input('name');
     	$company->color = $request->input('color');
@@ -84,6 +89,11 @@ class CompaniesController extends Controller
      */
     public function update(Request $request, $id)
     {
+    	$this->validate($request, [
+    			'name' => 'required|unique:companies|min:4',
+    			'color' => 'required',
+    	]);
+    	
     	$company = Company::find($id);
     	$company->name = $request->input('name');
     	$company->color = $request->input('color');

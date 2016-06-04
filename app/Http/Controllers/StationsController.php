@@ -65,6 +65,9 @@ class StationsController extends Controller
     	
     	DB::table('stations')->insert(['name' => $name]
 	);*/
+    	$this->validate($request, [
+    			'name' => 'required|unique:stations|min:4',
+    	]);
     	
     	$station = new Station;
     	$station->name = $request->input('name');
@@ -122,6 +125,10 @@ class StationsController extends Controller
     	//$name = $request->input('name');
     	
     	//DB::table('stations')->update(['name' => $name])->where(['id' => $id]);
+    	
+    	$this->validate($request, [
+    			'name' => 'required|unique:stations|min:4',
+    	]);
     	
     	$station = Station::find($id);
     	$station->name = $request->input('name');

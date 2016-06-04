@@ -8,6 +8,12 @@
 		<div class="form-group">
 			<label for="email">Nowy email:</label>
 			<input type="email" class="form-control" name="email" >
+			
+			@if ($errors->has('email'))
+            	<span class="help-block">
+                	<strong>{{ $errors->first('email') }}</strong>
+                </span>
+            @endif
 		</div>
 		<div class="form-group">
 			<label for="password">Twoje haslo:</label>

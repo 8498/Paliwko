@@ -17,6 +17,10 @@
 
 <link href='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.css' rel='stylesheet' />
 
+<script src="https://raw.githubusercontent.com/CliffCloud/Leaflet.EasyButton/master/src/easy-button.js"></script>
+
+<link href='https://raw.githubusercontent.com/CliffCloud/Leaflet.EasyButton/master/src/easy-button.css' rel='stylesheet' />
+
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css">
 
 <link rel="stylesheet" href="http://watson.lennardvoogdt.nl/Leaflet.awesome-markers/dist/leaflet.awesome-markers.css">
@@ -31,6 +35,32 @@
 
 @section('content')
 <div class="container">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<div class="panel-body">
+				<form class="form-horizontal">
+				
+					<div class="form-group">
+						<div class="col-md-6">
+							<label class="col-md-4 control-label">Firma</label>
+							
+							<select id="company" class="form-control">
+								<option value="wszystkie">Wszystkie</option>
+								@foreach ($companies as $company)
+	  							<option value="{{ $company->name }}">{{ $company->name }}</option>
+	  							@endforeach
+							</select>
+						
+							<button id="filtr" type="button" class="btn btn-primary">
+                                   Pokaz
+                            </button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
 	<div class="panel panel-default">
     	<div class="panel-heading">Legenda</div>
     		<div class="panel-body">
@@ -107,6 +137,12 @@
 
                             <div class="col-md-6">
                                 <input type="name" class="form-control" name="name" >
+                                
+                                @if ($errors->has('name'))
+                                    <span class="help-block">
+                                        <strong>{{ $errors->first('name') }}</strong>
+                                    </span>
+                                @endif
                             </div>
                             
                             <label class="col-md-4 control-label">Firma</label>
@@ -145,10 +181,7 @@
 
 <script type="text/javascript">
 
-function getColor(color)
-{
-	return {icon: L.AwesomeMarkers.icon({icon: 'flag',  prefix: 'glyphicon',markerColor: color})};
-}
+
 
 $(document).ready(function() {
     $('#addStation').prop('disabled', true);
@@ -160,6 +193,13 @@ $.ajaxSetup({
 	 }
 	});
 
+document.getElementById("filtr").addEventListener("click", filtrfun);
+function filtrfun()
+{
+	function getColor(color)
+	{
+		return {icon: L.AwesomeMarkers.icon({icon: 'flag',  prefix: 'glyphicon',markerColor: color})};
+	}
 L.mapbox.accessToken = 'pk.eyJ1IjoicGxveHFxIiwiYSI6ImNpbzh3czQzcTAwOHh1c2tuejFjMHFzNWEifQ.e7p65gm0vPLir5gtCFWJZQ';
 // Replace 'mapbox.streets' with your map id.
 var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
@@ -194,11 +234,16 @@ var map = L.map('map')
 			latlngUser = e.latlng;
 	
 			circle = L.circle(e.latlng, radius).addTo(map);
+
+			L.easyButton('fa-crosshairs fa-lg', function(btn, map){
+				map.setView(e.latlng);
+			}).addTo(map);
 });
 
 	
 	
-	$(document).ready(function() {
+	/*$(document).ready(function() 
+			{
 		  $.ajax({
 	            type: "GET",
 	            url: '/stations/fetch',
@@ -206,7 +251,13 @@ var map = L.map('map')
 	            success: function( response ) {
 	            	console.log(Object.keys(response).length);
 	            	response.forEach(function(data) {
-	            	      var stationMarker = L.marker([data.latitude,data.longtitude],getColor(data.color)).bindPopup(data.name);
+	            	      var stationMarker = L.marker([data.latitude,data.longtitude],getColor(data.color)).bindPopup("nazwa: "+data.name+"<br>"+" firma: "+data.company_name);
+	            	      stationMarker.on('mouseover',function (e){
+		            	      this.openPopup();
+		            	      });
+	            	      stationMarker.on('mouseout',function (e){
+		            	      this.closePopup();
+		            	      });
 	            	      stationMarker.on('click', function (e) {
 	            	    	  L.Routing.control({
 	            	    		  waypoints: [
@@ -225,14 +276,92 @@ var map = L.map('map')
 	            }
 	        });
 	        console.log(typeof(id));
-	});	
+	});	*/
+
+	
+
+		var stationMarker = null;
+		console.log(document.getElementById("company").value);
+		$.ajax({
+            type: "GET",
+            url: '/stations/fetch',
+            datatype: "JSON",   
+            success: function( response ) {
+            	console.log(Object.keys(response).length);
+            	response.forEach(function(data) {
+
+					console.log(data.company_name);
+					console.log(document.getElementById("company").value);
+					if(data.company_name === document.getElementById("company").value){
+						console.log("tak");
+						stationMarker = L.marker([data.latitude,data.longtitude],getColor(data.color)).bindPopup("nazwa: "+data.name+"<br>"+" firma: "+data.company_name);
+						stationMarker.on('mouseover',function (e){
+		            	      this.openPopup();
+		            	      });
+	            	      stationMarker.on('mouseout',function (e){
+		            	      this.closePopup();
+		            	      });
+	            	      stationMarker.on('click', function (e) {
+	            	    	  L.Routing.control({
+	            	    		  waypoints: [
+	            	    		    L.latLng(e.latlng),
+	            	    		    L.latLng(latlngUser)
+	            	    		  ],
+	            	    		  draggableWaypoints: false,
+	            	    		  addWaypoints: false,
+	            	    		  reverseWaypoints: true,
+	            	    		  show: false
+	            	    		}).addTo(map);
+	            	      });
+	            	      stationMarker.addTo(map);
+	            	      console.log(data);
+						}
+					else if("wszystkie" === document.getElementById("company").value){
+						console.log("nie");
+						stationMarker = L.marker([data.latitude,data.longtitude],getColor(data.color)).bindPopup("nazwa: "+data.name+"<br>"+" firma: "+data.company_name);
+						stationMarker.on('mouseover',function (e){
+		            	      this.openPopup();
+		            	      });
+	            	      stationMarker.on('mouseout',function (e){
+		            	      this.closePopup();
+		            	      });
+	            	      stationMarker.on('click', function (e) {
+	            	    	  L.Routing.control({
+	            	    		  waypoints: [
+	            	    		    L.latLng(e.latlng),
+	            	    		    L.latLng(latlngUser)
+	            	    		  ],
+	            	    		  draggableWaypoints: false,
+	            	    		  addWaypoints: false,
+	            	    		  reverseWaypoints: true,
+	            	    		  show: false
+	            	    		}).addTo(map);
+	            	      });
+	            	      stationMarker.addTo(map);
+	            	      console.log(data);
+						}
+						
+                	/*if(document.getElementById("company").value = "wszyscy")
+                	{
+                		stationMarker = L.marker([data.latitude,data.longtitude],getColor(data.color)).bindPopup("nazwa: "+data.name+"<br>"+" firma: "+data.company_name);
+                    }
+                	else if(data.company_name = document.getElementById("company").value)
+                	{
+                		stationMarker = L.marker([data.latitude,data.longtitude],getColor(data.color)).bindPopup("nazwa: "+data.name+"<br>"+" firma: "+data.company_name);
+                	}*/
+            	      
+            	      
+            	   });
+            }
+        });
+        console.log(typeof(id));
+	
 	
 	function onLocationError(e) {
     alert(e.message);
 	}
-
+	
 	map.on('locationerror', onLocationError);
-
 		
 		var kord = new Vue({
 			el:'#kord',
@@ -256,6 +385,7 @@ var map = L.map('map')
 		}
 		
 		map.on('click', sendKords);
+}
 </script>
 
 @endsection
